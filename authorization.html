@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Авторизация</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+            background-color: #f5f5f5;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .header {
+            background-color: #ffb299;
+            padding: 20px 0;
+            text-align: center;
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index: 100;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .header h1 {
+            color: white;
+            font-size: 36px;
+            font-weight: bold;
+        }
+
+        .auth-container {
+            background-color: white;
+            border-radius: 12px;
+            box-shadow: 0 3px 15px rgba(0,0,0,0.1);
+            padding: 40px;
+            width: 100%;
+            max-width: 450px;
+            margin-top: 80px;
+        }
+
+        .auth-title {
+            font-size: 28px;
+            margin-bottom: 30px;
+            color: #333;
+            text-align: center;
+        }
+
+        .auth-form {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+            position: relative;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            color: #555;
+            font-weight: bold;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 12px 45px 12px 15px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: #ff8c6d;
+        }
+
+        .form-input.error {
+            border-color: #ff4d4d;
+        }
+
+        .password-toggle {
+            position: absolute;
+            right: 15px;
+            top: 38px;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: #777;
+            font-size: 18px;
+        }
+
+        .password-toggle:hover {
+            color: #ff8c6d;
+        }
+
+        .error-message {
+            color: #ff4d4d;
+            font-size: 14px;
+            margin-top: 5px;
+            display: none;
+        }
+
+        .success-message {
+            color: #4CAF50;
+            font-size: 14px;
+            margin-top: 5px;
+            display: none;
+        }
+
+        .auth-button {
+            background-color: #ff8c6d;
+            color: white;
+            border: none;
+            padding: 14px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 18px;
+            font-weight: bold;
+            transition: background-color 0.3s;
+            margin-top: 10px;
+        }
+
+        .auth-button:hover {
+            background-color: #ff7a55;
+        }
+
+        .auth-links {
+            text-align: center;
+            margin-top: 25px;
+            color: #666;
+        }
+
+        .auth-link {
+            color: #ff8c6d;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        .auth-link:hover {
+            text-decoration: underline;
+        }
+
+        .divider {
+            height: 1px;
+            background-color: #eee;
+            margin: 25px 0;
+        }
+
+        .auth-footer {
+            font-size: 14px;
+            color: #888;
+            text-align: center;
+            margin-top: 20px;
+            line-height: 1.5;
+        }
+        .password-toggle{
+            padding-top: 17px;
+        }
+
+        @media (max-width: 768px) {
+            .auth-container {
+                padding: 25px;
+                margin: 100px 15px 20px;
+            }
+            
+            .header h1 {
+                font-size: 28px;
+            }
+            
+            .auth-title {
+                font-size: 24px;
+            }
+
+        }
+    </style>
+</head>
+<body>
+    <div class="auth-container">
+        <h2 class="auth-title">Добро пожаловать</h2>
+        
+        <div class="auth-links">
+            <p>Нет аккаунта? <a href="registration.html" class="auth-link">Бесплатная регистрация</a></p>
+        </div>
+        
+        <form class="auth-form" id="authForm">
+            <div class="form-group">
+                <label class="form-label">Email</label>
+                <input type="email" class="form-input" id="authEmail" placeholder="Введите ваш email" required>
+                <div class="error-message" id="authEmailError">Пожалуйста, введите корректный email</div>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">Пароль</label>
+                <input type="password" class="form-input" id="authPassword" placeholder="Введите ваш пароль" required>
+                <button type="button" class="password-toggle" id="authPasswordToggle">
+                    <span id="authPasswordToggleIcon">⭕</span>
+                </button>
+                <div class="error-message" id="authPasswordError">Пожалуйста, введите пароль</div>
+            </div>
+            
+            <div class="error-message" id="authGeneralError">Неправильный логин или пароль</div>
+            
+            <button type="submit" class="auth-button">Войти</button>
+        </form>
+        
+        <div class="divider"></div>
+        
+        <div class="auth-footer">
+            <p>Войдя в систему, вы соглашаетесь с "Условиями использования" и "Политикой конфиденциальности"</p>
+        </div>
+    </div>
+
+    <script>
+      
+        function getUsers() {
+            const usersJSON = localStorage.getItem('users');
+            return usersJSON ? JSON.parse(usersJSON) : [];
+        }
+
+   
+        function saveUsers(users) {
+            localStorage.setItem('users', JSON.stringify(users));
+        }
+
+   
+        function validateEmail(email) {
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            return emailRegex.test(email);
+        }
+
+     
+        function validatePassword(password) {
+            if (!password) {
+                return { isValid: false, message: "Пожалуйста, введите пароль" };
+            }
+            return { isValid: true, message: "" };
+        }
+
+   
+        function togglePasswordVisibility(passwordInputId, toggleIconId) {
+            const passwordInput = document.getElementById(passwordInputId);
+            const toggleIcon = document.getElementById(toggleIconId);
+            
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                toggleIcon.textContent = '❌';
+            } else {
+                passwordInput.type = 'password';
+                toggleIcon.textContent = '⭕';
+            }
+        }
+
+     
+        document.getElementById('authPasswordToggle').addEventListener('click', function() {
+            togglePasswordVisibility('authPassword', 'authPasswordToggleIcon');
+        });
+
+     
+        document.getElementById('authForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+       
+            document.querySelectorAll('.error-message').forEach(el => {
+                el.style.display = 'none';
+            });
+            
+     
+            const email = document.getElementById('authEmail').value.trim();
+            const password = document.getElementById('authPassword').value;
+            
+            let isValid = true;
+            
+        
+            if (!validateEmail(email)) {
+                document.getElementById('authEmailError').style.display = 'block';
+                document.getElementById('authEmail').classList.add('error');
+                isValid = false;
+            } else {
+                document.getElementById('authEmail').classList.remove('error');
+            }
+            
+      
+            if (!password) {
+                document.getElementById('authPasswordError').textContent = "Пожалуйста, введите пароль";
+                document.getElementById('authPasswordError').style.display = 'block';
+                document.getElementById('authPassword').classList.add('error');
+                isValid = false;
+            } else {
+                document.getElementById('authPassword').classList.remove('error');
+            }
+            
+            if (!isValid) return;
+            
+         
+            const users = getUsers();
+            const user = users.find(u => u.email === email && u.password === password);
+            
+       
+            const adminEmail = 'adminMain176845@mail.ru';
+            const adminPassword = 'admin768371main1';
+            
+            if (email === adminEmail && password === adminPassword) {
+            
+                const adminUser = {
+                    email: adminEmail,
+                    password: adminPassword,
+                    isAdmin: true
+                };
+                localStorage.setItem('currentUser', JSON.stringify(adminUser));
+                alert('Вы успешно авторизовались как администратор!');
+                window.location.href = 'admin.html';
+            } else if (user) {
+              
+                localStorage.setItem('currentUser', JSON.stringify(user));
+                alert('Вы успешно авторизовались!');
+                window.location.href = 'index.html';
+            } else {
+             
+                document.getElementById('authGeneralError').style.display = 'block';
+            }
+        });
+
+       
+        document.addEventListener('DOMContentLoaded', function() {
+          
+            document.getElementById('authEmail').value = 'adminMain176845@mail.ru';
+            document.getElementById('authPassword').value = 'admin768371main1';
+        });
+    </script>
+</body>
+</html>

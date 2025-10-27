@@ -1,0 +1,866 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Расчет стоимости проекта</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+            background-color: #f5f5f5;
+        }
+
+        .header {
+            background-color: #ffb299;
+            padding: 30px 0;
+            text-align: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .header h1 {
+            color: white;
+            font-size: 36px;
+            font-weight: bold;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 30px 20px;
+        }
+
+        .card {
+            background-color: white;
+            border-radius: 12px;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+            padding: 30px;
+            margin-bottom: 30px;
+        }
+
+        .card h2 {
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 24px;
+            text-align: center;
+        }
+
+        .selected-project {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 20px;
+            background-color: #fff4f1;
+            border-radius: 8px;
+            border-left: 4px solid #ff8c6d;
+        }
+
+        .selected-project h3 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .selected-project img {
+            max-width: 100%;
+            max-height: 200px;
+            border-radius: 8px;
+            margin: 15px 0;
+        }
+
+        .project-materials {
+            color: #666;
+            font-style: italic;
+            margin-bottom: 10px;
+        }
+
+        .project-cost {
+            color: #28a745;
+            font-weight: bold;
+            margin-top: 10px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: #555;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+        }
+
+        .form-row {
+            display: flex;
+            gap: 15px;
+        }
+
+        .form-row .form-group {
+            flex: 1;
+        }
+
+        .material-section {
+            background-color: #fff4f1;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border-left: 4px solid #ffb299;
+        }
+
+        .material-section h3 {
+            color: #ffb299;
+            margin-bottom: 15px;
+            font-size: 18px;
+        }
+
+        .material-info {
+            background-color: #fff4f1;
+            padding: 12px;
+            border-radius: 6px;
+            margin-bottom: 15px;
+        }
+
+        .material-name {
+            font-weight: bold;
+            color: #1971c2;
+            font-size: 16px;
+        }
+
+        .material-price {
+            color: #28a745;
+            font-weight: bold;
+            margin-top: 5px;
+        }
+
+        .optional-section {
+            background-color: #fff4f1;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 15px;
+        }
+
+        .optional-section h4 {
+            color: #555;
+            margin-bottom: 12px;
+            font-size: 16px;
+        }
+
+        .btn {
+            background-color: #ff7a55;
+            color: white;
+            border: none;
+            padding: 14px 25px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 18px;
+            font-weight: bold;
+            transition: background-color 0.3s;
+            display: block;
+            width: 100%;
+        }
+
+        .btn:hover {
+            background-color: #ff7a55;
+        }
+
+        .btn-secondary {
+            background-color: #6c757d;
+            margin-top: 10px;
+        }
+
+        .btn-secondary:hover {
+            background-color: #5a6268;
+        }
+
+        .btn-clear-history {
+            background-color: #dc3545;
+            width: auto;
+            margin: 20px auto 0;
+            padding: 10px 20px;
+        }
+
+        .btn-clear-history:hover {
+            background-color: #c82333;
+        }
+
+        .calculation-result {
+            display: none;
+            text-align: center;
+            padding: 30px;
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            margin-top: 30px;
+        }
+
+        .result-title {
+            color: #333;
+            font-size: 24px;
+            margin-bottom: 20px;
+        }
+
+        .result-amount {
+            font-size: 36px;
+            font-weight: bold;
+            color: #28a745;
+            margin: 20px 0;
+        }
+
+        .result-details {
+            text-align: left;
+            margin-top: 20px;
+            padding: 20px;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .result-details h4 {
+            color: #333;
+            margin-bottom: 15px;
+        }
+
+        .detail-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .detail-item:last-child {
+            border-bottom: none;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .history-section {
+            margin-top: 40px;
+        }
+
+        .history-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .history-item {
+            background-color: white;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            border-left: 4px solid #ff8c6d;
+            transition: transform 0.2s;
+        }
+
+        .history-item:hover {
+            transform: translateY(-2px);
+        }
+
+        .history-date {
+            color: #666;
+            font-size: 14px;
+            margin-bottom: 8px;
+        }
+
+        .history-project {
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 8px;
+            font-size: 18px;
+        }
+
+        .history-materials {
+            color: #555;
+            font-size: 14px;
+            margin-bottom: 10px;
+            line-height: 1.4;
+            background-color: #f8f9fa;
+            padding: 10px;
+            border-radius: 6px;
+        }
+
+        .history-material-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 5px;
+            padding-bottom: 5px;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .history-material-item:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+        }
+
+        .history-total {
+            color: #28a745;
+            font-weight: bold;
+            font-size: 20px;
+            text-align: right;
+            margin-top: 10px;
+        }
+
+        .no-history {
+            text-align: center;
+            color: #666;
+            padding: 40px;
+            font-style: italic;
+            background-color: white;
+            border-radius: 8px;
+        }
+
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 25px;
+            border-radius: 8px;
+            color: white;
+            font-weight: bold;
+            z-index: 1100;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .success {
+            background-color: #28a745;
+        }
+
+        .error {
+            background-color: #dc3545;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px 15px;
+            }
+            
+            .card {
+                padding: 20px;
+            }
+            
+            .form-row {
+                flex-direction: column;
+                gap: 0;
+            }
+            
+            .header h1 {
+                font-size: 28px;
+            }
+            
+            .result-amount {
+                font-size: 28px;
+            }
+            
+            .history-header {
+                flex-direction: column;
+                gap: 15px;
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <h1>Расчет стоимости проекта</h1>
+    </div>
+
+    <div class="container">
+        <div class="card">
+            <div class="selected-project" id="selected-project">
+                <h3>Выбранный проект: <span id="project-title">Не выбран</span></h3>
+                <div id="project-image"></div>
+                <p class="project-materials" id="project-materials">Материалы не указаны</p>
+                <p class="project-cost" id="project-cost">Стоимость материалов проекта: не указана</p>
+            </div>
+
+            <h2>Введите параметры для каждого материала</h2>
+            
+            <form id="calculation-form">
+                <div id="materials-container">
+                  
+                </div>
+                
+                <button type="submit" class="btn" id="calculate-btn">Рассчитать общую стоимость</button>
+                <button type="button" class="btn btn-secondary" onclick="resetForm()">Сбросить форму</button>
+            </form>
+        </div>
+
+        <div class="card calculation-result" id="calculation-result">
+            <h2 class="result-title">Результат расчета</h2>
+            <div class="result-amount" id="result-amount">0 руб.</div>
+            
+            <div class="result-details">
+                <h4>Детали расчета:</h4>
+                <div id="material-details"></div>
+                <div class="detail-item">
+                    <span>Итого:</span>
+                    <span id="detail-total">0 руб.</span>
+                </div>
+            </div>
+            
+            <button type="button" class="btn" onclick="newCalculation()" style="margin-top: 20px;">Сделать новый расчет</button>
+        </div>
+
+       
+        <div class="card history-section">
+            <div class="history-header">
+                <h2>История ваших расчетов</h2>
+                <button type="button" class="btn btn-clear-history" onclick="clearHistory()">Очистить историю</button>
+            </div>
+            <div id="calculation-history">
+                <div class="no-history">У вас пока нет сохраненных расчетов</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+     
+        let selectedProject = null;
+        let projectMaterials = [];
+
+      
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('Страница загружена');
+            loadSelectedProject();
+            setupEventListeners();
+            loadCalculationHistory();
+        });
+
+    
+        function loadSelectedProject() {
+            const storedProject = localStorage.getItem('selectedProject');
+            console.log('Данные из localStorage:', storedProject);
+            
+            if (storedProject) {
+                try {
+                    selectedProject = JSON.parse(storedProject);
+                    console.log('Загружен проект:', selectedProject);
+                    displaySelectedProject();
+                    processProjectMaterials();
+                    createMaterialSections();
+                } catch (error) {
+                    console.error('Ошибка при загрузке проекта:', error);
+                    showNotification('Ошибка при загрузке данных проекта', 'error');
+                }
+            } else {
+                console.log('Проект не выбран');
+                showNotification('Проект не выбран. Вернитесь в галерею и выберите проект.', 'error');
+            }
+        }
+
+     
+        function displaySelectedProject() {
+            if (!selectedProject) return;
+            
+            document.getElementById('project-title').textContent = selectedProject.title || 'Неизвестный проект';
+            document.getElementById('project-materials').textContent = formatMaterialsForDisplay(selectedProject.materials);
+            document.getElementById('project-cost').textContent = `Стоимость материалов проекта: ${selectedProject.cost || 'не указана'}`;
+            
+            if (selectedProject.imageUrl) {
+                const projectImage = document.getElementById('project-image');
+                projectImage.innerHTML = `<img src="${selectedProject.imageUrl}" alt="${selectedProject.title}">`;
+            }
+        }
+
+        
+        function processProjectMaterials() {
+            if (!selectedProject) return;
+            
+            projectMaterials = [];
+            
+          
+            const cost = extractPriceFromCost(selectedProject.cost);
+            console.log('Извлеченная стоимость из карточки:', cost);
+            
+           
+            if (Array.isArray(selectedProject.materials) && selectedProject.materials.length > 0) {
+              
+                selectedProject.materials.forEach((material, index) => {
+                    if (typeof material === 'object' && material.name) {
+                        projectMaterials.push({
+                            name: material.name,
+                            price: material.price || cost || 500
+                        });
+                    } else if (typeof material === 'string') {
+                        projectMaterials.push({
+                            name: material,
+                            price: cost || 500
+                        });
+                    }
+                });
+            } else {
+             
+                projectMaterials.push({
+                    name: 'Основной материал',
+                    price: cost || 500
+                });
+            }
+            
+            console.log('Созданные материалы для расчета:', projectMaterials);
+        }
+
+        
+        function extractPriceFromCost(costString) {
+            if (!costString) return 500;
+            const match = costString.match(/(\d+)/);
+            return match ? parseInt(match[1]) : 500;
+        }
+
+      
+        function formatMaterialsForDisplay(materials) {
+            if (!materials) return 'Материалы не указаны';
+            
+            if (Array.isArray(materials)) {
+                if (materials.length > 0 && typeof materials[0] === 'object' && materials[0].name) {
+                    return materials.map(material => 
+                        `${material.name} - ${material.quantity || 1} шт. (${material.price || '?'} руб./шт.)`
+                    ).join(', ');
+                } else if (typeof materials[0] === 'string') {
+                    return materials.join(', ');
+                }
+            } else if (typeof materials === 'string') {
+                return materials;
+            }
+            
+            return 'Информация о материалах недоступна';
+        }
+
+     
+        function createMaterialSections() {
+            const materialsContainer = document.getElementById('materials-container');
+            materialsContainer.innerHTML = '';
+            
+            if (projectMaterials.length === 0) {
+                materialsContainer.innerHTML = '<p>Нет данных о материалах</p>';
+                return;
+            }
+            
+            projectMaterials.forEach((material, index) => {
+                const materialId = index + 1;
+                const materialSection = document.createElement('div');
+                materialSection.className = 'material-section';
+                materialSection.innerHTML = `
+                    <h3>Материал ${materialId}</h3>
+                    <div class="material-info">
+                        <div class="material-name">${material.name}</div>
+                        <div class="material-price">Стоимость: ${material.price} руб./м²</div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="total-area-${materialId}">Общая площадь для этого материала (м²)</label>
+                        <input type="number" id="total-area-${materialId}" min="1" step="0.1" placeholder="Введите общую площадь" required value="10">
+                    </div>
+                    
+                    <div class="optional-section">
+                        <h4>Дополнительные параметры для этого материала (необязательные)</h4>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="window-area-${materialId}">Площадь одного окна (м²)</label>
+                                <input type="number" id="window-area-${materialId}" min="0" step="0.1" placeholder="Площадь окна" value="0">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="window-count-${materialId}">Количество окон</label>
+                                <input type="number" id="window-count-${materialId}" min="0" placeholder="Количество" value="0">
+                            </div>
+                        </div>
+                        
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="door-area-${materialId}">Площадь одной двери (м²)</label>
+                                <input type="number" id="door-area-${materialId}" min="0" step="0.1" placeholder="Площадь двери" value="0">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="door-count-${materialId}">Количество дверей</label>
+                                <input type="number" id="door-count-${materialId}" min="0" placeholder="Количество" value="0">
+                            </div>
+                        </div>
+                    </div>
+                `;
+                materialsContainer.appendChild(materialSection);
+            });
+        }
+
+    
+        function setupEventListeners() {
+            const form = document.getElementById('calculation-form');
+            const calculateBtn = document.getElementById('calculate-btn');
+            
+        
+            form.addEventListener('submit', function(e) {
+                e.preventDefault();
+                console.log('Форма отправлена - начинаем расчет');
+                calculateCost();
+            });
+            
+      
+            calculateBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                console.log('Кнопка расчета нажата - начинаем расчет');
+                calculateCost();
+            });
+        }
+
+      
+        function calculateCost() {
+            console.log('=== НАЧАЛО РАСЧЕТА ===');
+            
+            let totalCost = 0;
+            const materialDetails = [];
+            let hasErrors = false;
+            
+        
+            for (let i = 0; i < projectMaterials.length; i++) {
+                const material = projectMaterials[i];
+                const materialId = i + 1;
+                
+                console.log(`Обрабатываем материал ${materialId}: ${material.name}`);
+                
+           
+                const totalArea = getInputValue(`total-area-${materialId}`);
+                const windowArea = getInputValue(`window-area-${materialId}`);
+                const windowCount = getInputValue(`window-count-${materialId}`);
+                const doorArea = getInputValue(`door-area-${materialId}`);
+                const doorCount = getInputValue(`door-count-${materialId}`);
+                
+                console.log(`Площадь: ${totalArea}, Окна: ${windowArea} x ${windowCount}, Двери: ${doorArea} x ${doorCount}`);
+                
+            
+                if (!totalArea || totalArea <= 0) {
+                    showNotification(`Введите корректную площадь для материала "${material.name}"`, 'error');
+                    hasErrors = true;
+                    continue;
+                }
+                
+          
+                const totalWindowArea = (windowArea || 0) * (windowCount || 0);
+                const totalDoorArea = (doorArea || 0) * (doorCount || 0);
+                
+           
+                const cleanArea = totalArea - totalWindowArea - totalDoorArea;
+                
+                if (cleanArea < 0) {
+                    showNotification(`Слишком большая площадь окон/дверей для материала "${material.name}"`, 'error');
+                    hasErrors = true;
+                    continue;
+                }
+                
+             
+                const materialCost = cleanArea * material.price;
+                totalCost += materialCost;
+                
+       
+                materialDetails.push({
+                    name: material.name,
+                    totalArea: totalArea,
+                    windowArea: totalWindowArea,
+                    doorArea: totalDoorArea,
+                    cleanArea: cleanArea,
+                    cost: materialCost,
+                    pricePerM2: material.price
+                });
+                
+                console.log(`Материал "${material.name}": ${cleanArea} м² × ${material.price} руб. = ${materialCost} руб.`);
+            }
+            
+            if (hasErrors) {
+                console.log('Расчет завершен с ошибками');
+                return;
+            }
+            
+            console.log('Общая стоимость:', totalCost);
+            
+         
+            showResults(totalCost, materialDetails);
+        }
+
+    
+        function getInputValue(id) {
+            const element = document.getElementById(id);
+            if (!element) return 0;
+            const value = parseFloat(element.value);
+            return isNaN(value) ? 0 : value;
+        }
+
+    
+        function showResults(totalCost, materialDetails) {
+   
+            document.getElementById('result-amount').textContent = `${totalCost.toFixed(2)} руб.`;
+            document.getElementById('detail-total').textContent = `${totalCost.toFixed(2)} руб.`;
+            
+      
+            const materialDetailsContainer = document.getElementById('material-details');
+            materialDetailsContainer.innerHTML = '';
+            
+            materialDetails.forEach(material => {
+      
+                const materialHeader = document.createElement('div');
+                materialHeader.className = 'detail-item';
+                materialHeader.style.fontWeight = 'bold';
+                materialHeader.style.color = '#1971c2';
+                materialHeader.style.marginTop = '15px';
+                materialHeader.innerHTML = `<span>${material.name}:</span><span></span>`;
+                materialDetailsContainer.appendChild(materialHeader);
+                
+      
+                addDetail(materialDetailsContainer, 'Площадь стен:', `${material.totalArea.toFixed(2)} м²`);
+                
+                if (material.windowArea > 0) {
+                    addDetail(materialDetailsContainer, 'Площадь окон:', `${material.windowArea.toFixed(2)} м²`);
+                }
+                
+                if (material.doorArea > 0) {
+                    addDetail(materialDetailsContainer, 'Площадь дверей:', `${material.doorArea.toFixed(2)} м²`);
+                }
+                
+                addDetail(materialDetailsContainer, 'Чистая площадь:', `${material.cleanArea.toFixed(2)} м²`);
+                addDetail(materialDetailsContainer, `Стоимость (${material.pricePerM2} руб./м²):`, `${material.cost.toFixed(2)} руб.`);
+            });
+            
+     
+            document.getElementById('calculation-result').style.display = 'block';
+            document.getElementById('calculation-result').scrollIntoView({ behavior: 'smooth' });
+            
+     
+            saveToHistory(totalCost, materialDetails);
+            
+            showNotification('Расчет выполнен успешно!', 'success');
+            console.log('=== РАСЧЕТ УСПЕШНО ЗАВЕРШЕН ===');
+        }
+
+    
+        function addDetail(container, label, value) {
+            const detail = document.createElement('div');
+            detail.className = 'detail-item';
+            detail.innerHTML = `
+                <span style="padding-left: 15px;">${label}</span>
+                <span>${value}</span>
+            `;
+            container.appendChild(detail);
+        }
+
+
+        function saveToHistory(totalCost, materialDetails) {
+            const calculation = {
+                id: Date.now(),
+                date: new Date().toLocaleString('ru-RU'),
+                project: selectedProject.title,
+                totalCost: totalCost,
+                materials: materialDetails.map(m => ({
+                    name: m.name,
+                    area: m.cleanArea,
+                    price: m.pricePerM2,
+                    cost: m.cost
+                })),
+                timestamp: new Date().getTime()
+            };
+            
+            let history = JSON.parse(localStorage.getItem('calculationHistory') || '[]');
+            history.unshift(calculation);
+            
+       
+            if (history.length > 50) {
+                history = history.slice(0, 50);
+            }
+            
+            localStorage.setItem('calculationHistory', JSON.stringify(history));
+            
+            loadCalculationHistory();
+        }
+
+        function loadCalculationHistory() {
+            const historyContainer = document.getElementById('calculation-history');
+            const history = JSON.parse(localStorage.getItem('calculationHistory') || '[]');
+            
+            if (history.length === 0) {
+                historyContainer.innerHTML = '<div class="no-history">У вас пока нет сохраненных расчетов</div>';
+                return;
+            }
+            
+            let historyHTML = '';
+            history.forEach(item => {
+                const materialsHTML = item.materials.map(m => 
+                    `<div class="history-material-item">
+                         <span>${m.name}</span>
+                         <span>${m.area.toFixed(1)}м² × ${m.price}руб. = ${m.cost.toFixed(2)}руб.</span>
+                     </div>`
+                ).join('');
+                
+                historyHTML += `
+                    <div class="history-item">
+                        <div class="history-date">${item.date}</div>
+                        <div class="history-project">${item.project}</div>
+                        <div class="history-materials">
+                            ${materialsHTML}
+                        </div>
+                        <div class="history-total">${item.totalCost.toFixed(2)} руб.</div>
+                    </div>
+                `;
+            });
+            
+            historyContainer.innerHTML = historyHTML;
+        }
+
+
+        function clearHistory() {
+            if (confirm('Вы уверены, что хотите очистить всю историю расчетов?')) {
+                localStorage.removeItem('calculationHistory');
+                loadCalculationHistory();
+                showNotification('История расчетов очищена', 'success');
+            }
+        }
+
+
+        function resetForm() {
+            document.getElementById('calculation-form').reset();
+            document.getElementById('calculation-result').style.display = 'none';
+            showNotification('Форма сброшена', 'success');
+        }
+
+
+        function newCalculation() {
+            resetForm();
+            document.getElementById('calculation-result').style.display = 'none';
+        }
+
+
+        function showNotification(message, type) {
+            const notification = document.createElement('div');
+            notification.className = `notification ${type}`;
+            notification.textContent = message;
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.style.opacity = '1';
+            }, 10);
+            
+            setTimeout(() => {
+                notification.style.opacity = '0';
+                setTimeout(() => {
+                    document.body.removeChild(notification);
+                }, 300);
+            }, 3000);
+        }
+    </script>
+</body>
+</html>

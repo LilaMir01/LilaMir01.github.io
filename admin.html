@@ -1,0 +1,1127 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Административная панель</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+            background-color: #f5f5f5;
+        }
+
+        .header {
+            background-color: #ffb299;
+            padding: 30px 0;
+            text-align: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .header h1 {
+            color: white;
+            font-size: 36px;
+            font-weight: bold;
+        }
+
+        .container {
+            display: flex;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px 10px;
+        }
+
+        .admin-panel {
+            flex: 0 0 450px;
+            background-color: white;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+            margin-right: 20px;
+            height: fit-content;
+        }
+
+        .admin-panel h2 {
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 24px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: #555;
+        }
+
+        .form-group input,
+        .form-group textarea,
+        .form-group select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ff8c6d;
+            border-radius: 20px;
+            font-size: 16px;
+        }
+
+        .form-group textarea {
+            height: 120px;
+            resize: vertical;
+        }
+
+        .material-selection {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 15px;
+            background-color: #f9f9f9;
+        }
+
+        .material-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+            padding: 10px;
+            background: white;
+            border-radius: 6px;
+            border: 1px solid #eee;
+        }
+
+        .material-item select {
+            flex: 2;
+        }
+
+        .material-item input {
+            flex: 1;
+            text-align: center;
+        }
+
+        .material-price {
+            flex: 1;
+            text-align: right;
+            color: #666;
+            font-size: 14px;
+        }
+
+        .add-material-btn {
+            background-color: #ff8c6d;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 14px;
+            margin-top: 10px;
+        }
+
+        .add-material-btn:hover {
+            background-color: #ee6f4c;
+        }
+
+        .remove-material-btn {
+            background-color: #dc3545;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+
+        .remove-material-btn:hover {
+            background-color: #c82333;
+        }
+
+        .cost-summary {
+            background-color: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 15px;
+            text-align: center;
+        }
+
+        .cost-summary h4 {
+            color: #495057;
+            margin-bottom: 10px;
+        }
+
+        .total-cost {
+            font-size: 24px;
+            font-weight: bold;
+            color: #28a745;
+        }
+
+        .file-upload {
+            border: 2px dashed #ddd;
+            border-radius: 8px;
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: border-color 0.3s;
+        }
+
+        .file-upload:hover {
+            border-color: #ff8c6d;
+        }
+
+        .file-upload.dragover {
+            border-color: #ff8c6d;
+            background-color: #fff5f2;
+        }
+
+        .file-upload-icon {
+            font-size: 48px;
+            color: #ddd;
+            margin-bottom: 10px;
+        }
+
+        .file-upload-text {
+            color: #666;
+            margin-bottom: 10px;
+        }
+
+        .file-upload-btn {
+            background-color: #ff8c6d;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .file-input {
+            display: none;
+        }
+
+        .image-preview {
+            margin-top: 15px;
+            text-align: center;
+        }
+
+        .image-preview img {
+            max-width: 100%;
+            max-height: 200px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .btn {
+            background-color: #ff8c6d;
+            color: white;
+            border: none;
+            padding: 14px 25px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 18px;
+            font-weight: bold;
+            transition: background-color 0.3s;
+            display: block;
+            width: 100%;
+        }
+
+        .btn:hover {
+            background-color: #ff7a55;
+        }
+
+        .btn:disabled {
+            background-color: #cccccc;
+            cursor: not-allowed;
+        }
+
+        .admin-gallery {
+            flex: 1;
+        }
+
+        .admin-gallery h2 {
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 24px;
+        }
+
+        .gallery {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 20px;
+        }
+
+        .gallery-item {
+            background-color: white;
+            border-radius: 12px;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+            overflow: hidden;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .gallery-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .gallery-item img {
+            width: 100%;
+            height: 280px;
+            object-fit: cover;
+            display: block;
+        }
+
+        .gallery-item-content {
+            padding: 20px;
+        }
+
+        .gallery-item h3 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 20px;
+        }
+
+        .gallery-item p {
+            color: #555;
+            margin-bottom: 15px;
+            line-height: 1.5;
+        }
+
+        .gallery-item-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .gallery-item-actions button {
+            flex: 1;
+            padding: 10px;
+            border: none;
+            border-radius: 20px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .edit-btn {
+            background-color: #ff8c6d;
+            color: white;
+        }
+
+        .edit-btn:hover {
+            background-color: #df6a4a;
+        }
+
+        .delete-btn {
+            background-color: #dc3545;
+            color: white;
+        }
+
+        .delete-btn:hover {
+            background-color: #c82333;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            z-index: 1000;
+            overflow: auto;
+            animation: fadeIn 0.3s;
+        }
+
+        .modal-content {
+            background-color: white;
+            margin: 5% auto;
+            padding: 30px;
+            width: 90%;
+            max-width: 700px;
+            border-radius: 12px;
+            position: relative;
+            animation: slideIn 0.3s;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes slideIn {
+            from { transform: translateY(-50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 20px;
+            right: 25px;
+            font-size: 36px;
+            font-weight: bold;
+            cursor: pointer;
+            color: #555;
+            transition: color 0.3s;
+        }
+
+        .close-btn:hover {
+            color: #ff8c6d;
+        }
+
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 25px;
+            border-radius: 8px;
+            color: white;
+            font-weight: bold;
+            z-index: 1100;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .success {
+            background-color: #28a745;
+        }
+
+        .error {
+            background-color: #dc3545;
+        }
+
+        @media (max-width: 1024px) {
+            .container {
+                flex-direction: column;
+            }
+            
+            .admin-panel {
+                flex: none;
+                margin-right: 0;
+                margin-bottom: 20px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .gallery {
+                grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+                gap: 15px;
+            }
+            
+            .modal-content {
+                width: 95%;
+                margin: 10% auto;
+                padding: 20px;
+            }
+            
+            .header h1 {
+                font-size: 28px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <h1>Административная панель</h1>
+    </div>
+
+
+    <div class="container">
+
+        <div class="admin-panel">
+            <h2>Добавить новую карточку</h2>
+            <form id="add-card-form">
+                <div class="form-group">
+                    <label>Изображение</label>
+                    <div class="file-upload" id="file-upload-area">
+                        <div class="file-upload-icon">📁</div>
+                        <div class="file-upload-text">Перетащите изображение сюда или нажмите для выбора</div>
+                        <button type="button" class="file-upload-btn">Выбрать файл</button>
+                        <input type="file" id="image-file" class="file-input" accept="image/*">
+                    </div>
+                    <div class="image-preview" id="image-preview"></div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="card-title">Название проекта</label>
+                    <input type="text" id="card-title" placeholder="Введите название проекта" required>
+                </div>
+
+                <div class="form-group">
+                    <label>Выбор материалов и расчет стоимости</label>
+                    <div class="material-selection" id="material-selection">
+                        <div class="material-item" data-index="0">
+                            <select class="material-select" onchange="updateMaterialPrice(this)">
+                                <option value="">Выберите материал</option>
+                            </select>
+                            <input type="number" class="material-quantity" min="1" value="1" placeholder="Кол-во" onchange="calculateTotalCost()">
+                            <span class="material-price">0 руб.</span>
+                            <button type="button" class="remove-material-btn" onclick="removeMaterial(this)" style="display: none;">×</button>
+                        </div>
+                    </div>
+                    <button type="button" class="add-material-btn" onclick="addMaterial()">+ Добавить материал</button>
+                    
+                    <div class="cost-summary">
+                        <h4>Общая стоимость материалов</h4>
+                        <div class="total-cost" id="total-cost">0 руб.</div>
+                    </div>
+                </div>
+                
+                <button type="submit" class="btn" id="submit-btn">Добавить карточку</button>
+            </form>
+        </div>
+
+
+        <div class="admin-gallery">
+            <h2>Управление карточками галереи</h2>
+            <div class="gallery" id="admin-gallery">
+         
+            </div>
+        </div>
+    </div>
+
+
+    <div id="edit-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closeEditModal()">&times;</span>
+            <h2>Редактировать карточку</h2>
+            <form id="edit-card-form">
+                <input type="hidden" id="edit-card-id">
+                
+                <div class="form-group">
+                    <label>Изображение</label>
+                    <div class="file-upload" id="edit-file-upload-area">
+                        <div class="file-upload-icon">📁</div>
+                        <div class="file-upload-text">Перетащите новое изображение или нажмите для выбора</div>
+                        <button type="button" class="file-upload-btn">Выбрать файл</button>
+                        <input type="file" id="edit-image-file" class="file-input" accept="image/*">
+                    </div>
+                    <div class="image-preview" id="edit-image-preview"></div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="edit-card-title">Название проекта</label>
+                    <input type="text" id="edit-card-title" required>
+                </div>
+
+                <div class="form-group">
+                    <label>Выбор материалов и расчет стоимости</label>
+                    <div class="material-selection" id="edit-material-selection">
+                 
+                    </div>
+                    <button type="button" class="add-material-btn" onclick="addEditMaterial()">+ Добавить материал</button>
+                    
+                    <div class="cost-summary">
+                        <h4>Общая стоимость материалов</h4>
+                        <div class="total-cost" id="edit-total-cost">0 руб.</div>
+                    </div>
+                </div>
+                
+                <button type="submit" class="btn">Сохранить изменения</button>
+            </form>
+        </div>
+    </div>
+
+
+    <div id="notification" class="notification"></div>
+
+    <script>
+ 
+        const STORAGE_KEY = 'galleryCards';
+        
+ 
+        let materialPrices = {};
+        
+ 
+        let currentImageFile = null;
+        let currentEditImageFile = null;
+        
+ 
+        async function loadMaterialPrices() {
+            try {
+                const response = await fetch('price.json');
+                materialPrices = await response.json();
+                populateMaterialSelects();
+            } catch (error) {
+                console.error('Ошибка загрузки price.json:', error);
+
+                };
+                populateMaterialSelects();
+            }
+        
+
+
+        function populateMaterialSelects() {
+            const selects = document.querySelectorAll('.material-select');
+            selects.forEach(select => {
+  
+                const currentValue = select.value;
+                select.innerHTML = '<option value="">Выберите материал</option>';
+                
+
+                Object.keys(materialPrices).forEach(material => {
+                    const option = document.createElement('option');
+                    option.value = material;
+                    option.textContent = `${material} (${materialPrices[material]} руб.)`;
+                    select.appendChild(option);
+                });
+                
+    
+                if (currentValue && materialPrices[currentValue]) {
+                    select.value = currentValue;
+                    updateMaterialPrice(select);
+                }
+            });
+        }
+
+    
+        function getCards() {
+            const stored = localStorage.getItem(STORAGE_KEY);
+            return stored ? JSON.parse(stored) : [];
+        }
+        
+
+        function saveCards(cards) {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(cards));
+        }
+        
+
+        let cards = getCards();
+
+
+        document.addEventListener('DOMContentLoaded', function() {
+            loadMaterialPrices();
+            initFileUpload();
+            renderCards();
+   
+            document.getElementById('add-card-form').addEventListener('submit', function(e) {
+                e.preventDefault();
+                addNewCard();
+            });
+            
+  
+            document.getElementById('edit-card-form').addEventListener('submit', function(e) {
+                e.preventDefault();
+                saveCardChanges();
+            });
+        });
+
+  
+        function addMaterial() {
+            const container = document.getElementById('material-selection');
+            const index = container.children.length;
+            
+            const materialItem = document.createElement('div');
+            materialItem.className = 'material-item';
+            materialItem.setAttribute('data-index', index);
+            materialItem.innerHTML = `
+                <select class="material-select" onchange="updateMaterialPrice(this)">
+                    <option value="">Выберите материал</option>
+                </select>
+                <input type="number" class="material-quantity" min="1" value="1" placeholder="Кол-во" onchange="calculateTotalCost()">
+                <span class="material-price">0 руб.</span>
+                <button type="button" class="remove-material-btn" onclick="removeMaterial(this)">×</button>
+            `;
+            
+            container.appendChild(materialItem);
+            populateMaterialSelects();
+        }
+
+
+        function addEditMaterial() {
+            const container = document.getElementById('edit-material-selection');
+            const index = container.children.length;
+            
+            const materialItem = document.createElement('div');
+            materialItem.className = 'material-item';
+            materialItem.setAttribute('data-index', index);
+            materialItem.innerHTML = `
+                <select class="material-select" onchange="updateEditMaterialPrice(this)">
+                    <option value="">Выберите материал</option>
+                </select>
+                <input type="number" class="material-quantity" min="1" value="1" placeholder="Кол-во" onchange="calculateEditTotalCost()">
+                <span class="material-price">0 руб.</span>
+                <button type="button" class="remove-material-btn" onclick="removeEditMaterial(this)">×</button>
+            `;
+            
+            container.appendChild(materialItem);
+            populateMaterialSelects();
+        }
+
+        function removeMaterial(button) {
+            const materialItem = button.closest('.material-item');
+            materialItem.remove();
+            calculateTotalCost();
+            
+    
+            const container = document.getElementById('material-selection');
+            Array.from(container.children).forEach((item, index) => {
+                item.setAttribute('data-index', index);
+            });
+        }
+
+   
+        function removeEditMaterial(button) {
+            const materialItem = button.closest('.material-item');
+            materialItem.remove();
+            calculateEditTotalCost();
+            
+   
+            const container = document.getElementById('edit-material-selection');
+            Array.from(container.children).forEach((item, index) => {
+                item.setAttribute('data-index', index);
+            });
+        }
+
+
+        function updateMaterialPrice(select) {
+            const materialItem = select.closest('.material-item');
+            const priceElement = materialItem.querySelector('.material-price');
+            const quantityInput = materialItem.querySelector('.material-quantity');
+            
+            const material = select.value;
+            if (material && materialPrices[material]) {
+                const price = materialPrices[material];
+                priceElement.textContent = `${price} руб./шт`;
+                calculateTotalCost();
+            } else {
+                priceElement.textContent = '0 руб.';
+                calculateTotalCost();
+            }
+        }
+
+     
+        function updateEditMaterialPrice(select) {
+            const materialItem = select.closest('.material-item');
+            const priceElement = materialItem.querySelector('.material-price');
+            const quantityInput = materialItem.querySelector('.material-quantity');
+            
+            const material = select.value;
+            if (material && materialPrices[material]) {
+                const price = materialPrices[material];
+                priceElement.textContent = `${price} руб./шт`;
+                calculateEditTotalCost();
+            } else {
+                priceElement.textContent = '0 руб.';
+                calculateEditTotalCost();
+            }
+        }
+
+    
+        function calculateTotalCost() {
+            let total = 0;
+            const materialItems = document.querySelectorAll('#material-selection .material-item');
+            
+            materialItems.forEach(item => {
+                const select = item.querySelector('.material-select');
+                const quantityInput = item.querySelector('.material-quantity');
+                
+                const material = select.value;
+                const quantity = parseInt(quantityInput.value) || 0;
+                
+                if (material && materialPrices[material] && quantity > 0) {
+                    total += materialPrices[material] * quantity;
+                }
+            });
+            
+            document.getElementById('total-cost').textContent = `${total.toLocaleString('ru-RU')} руб.`;
+            return total;
+        }
+
+   
+        function calculateEditTotalCost() {
+            let total = 0;
+            const materialItems = document.querySelectorAll('#edit-material-selection .material-item');
+            
+            materialItems.forEach(item => {
+                const select = item.querySelector('.material-select');
+                const quantityInput = item.querySelector('.material-quantity');
+                
+                const material = select.value;
+                const quantity = parseInt(quantityInput.value) || 0;
+                
+                if (material && materialPrices[material] && quantity > 0) {
+                    total += materialPrices[material] * quantity;
+                }
+            });
+            
+            document.getElementById('edit-total-cost').textContent = `${total.toLocaleString('ru-RU')} руб.`;
+            return total;
+        }
+
+ 
+        function getSelectedMaterials() {
+            const materials = [];
+            const materialItems = document.querySelectorAll('#material-selection .material-item');
+            
+            materialItems.forEach(item => {
+                const select = item.querySelector('.material-select');
+                const quantityInput = item.querySelector('.material-quantity');
+                
+                const material = select.value;
+                const quantity = parseInt(quantityInput.value) || 0;
+                
+                if (material && quantity > 0) {
+                    materials.push({
+                        name: material,
+                        quantity: quantity,
+                        price: materialPrices[material]
+                    });
+                }
+            });
+            
+            return materials;
+        }
+
+
+        function getEditSelectedMaterials() {
+            const materials = [];
+            const materialItems = document.querySelectorAll('#edit-material-selection .material-item');
+            
+            materialItems.forEach(item => {
+                const select = item.querySelector('.material-select');
+                const quantityInput = item.querySelector('.material-quantity');
+                
+                const material = select.value;
+                const quantity = parseInt(quantityInput.value) || 0;
+                
+                if (material && quantity > 0) {
+                    materials.push({
+                        name: material,
+                        quantity: quantity,
+                        price: materialPrices[material]
+                    });
+                }
+            });
+            
+            return materials;
+        }
+
+
+        function initFileUpload() {
+            const fileUploadArea = document.getElementById('file-upload-area');
+            const fileInput = document.getElementById('image-file');
+            const fileUploadBtn = fileUploadArea.querySelector('.file-upload-btn');
+            
+            const editFileUploadArea = document.getElementById('edit-file-upload-area');
+            const editFileInput = document.getElementById('edit-image-file');
+            const editFileUploadBtn = editFileUploadArea.querySelector('.file-upload-btn');
+            
+            fileUploadBtn.addEventListener('click', () => fileInput.click());
+            fileInput.addEventListener('change', handleFileSelect);
+            
+            editFileUploadBtn.addEventListener('click', () => editFileInput.click());
+            editFileInput.addEventListener('change', handleEditFileSelect);
+            
+            setupDragAndDrop(fileUploadArea, fileInput);
+            setupDragAndDrop(editFileUploadArea, editFileInput);
+        }
+
+        function setupDragAndDrop(dropArea, fileInput) {
+            ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+                dropArea.addEventListener(eventName, preventDefaults, false);
+            });
+            
+            function preventDefaults(e) {
+                e.preventDefault();
+                e.stopPropagation();
+            }
+            
+            ['dragenter', 'dragover'].forEach(eventName => {
+                dropArea.addEventListener(eventName, () => {
+                    dropArea.classList.add('dragover');
+                }, false);
+            });
+            
+            ['dragleave', 'drop'].forEach(eventName => {
+                dropArea.addEventListener(eventName, () => {
+                    dropArea.classList.remove('dragover');
+                }, false);
+            });
+            
+            dropArea.addEventListener('drop', (e) => {
+                const files = e.dataTransfer.files;
+                if (files.length > 0) {
+                    fileInput.files = files;
+                    if (fileInput.id === 'image-file') {
+                        handleFileSelect({ target: fileInput });
+                    } else {
+                        handleEditFileSelect({ target: fileInput });
+                    }
+                }
+            }, false);
+        }
+
+        function handleFileSelect(e) {
+            const file = e.target.files[0];
+            if (file) {
+                if (!file.type.match('image.*')) {
+                    showNotification('Пожалуйста, выберите файл изображения', 'error');
+                    return;
+                }
+                
+                currentImageFile = file;
+                previewImage(file, 'image-preview');
+            }
+        }
+
+        function handleEditFileSelect(e) {
+            const file = e.target.files[0];
+            if (file) {
+                if (!file.type.match('image.*')) {
+                    showNotification('Пожалуйста, выберите файл изображения', 'error');
+                    return;
+                }
+                
+                currentEditImageFile = file;
+                previewImage(file, 'edit-image-preview');
+            }
+        }
+
+        function previewImage(file, previewElementId) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const preview = document.getElementById(previewElementId);
+                preview.innerHTML = `<img src="${e.target.result}" alt="Preview">`;
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function fileToBase64(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.readAsDataURL(file);
+                reader.onload = () => resolve(reader.result);
+                reader.onerror = error => reject(error);
+            });
+        }
+
+   
+        function renderCards() {
+            const gallery = document.getElementById('admin-gallery');
+            gallery.innerHTML = '';
+            
+            if (cards.length === 0) {
+                gallery.innerHTML = '<p>Карточек пока нет. Добавьте первую карточку!</p>';
+                return;
+            }
+            
+            cards.forEach(card => {
+                const cardElement = document.createElement('div');
+                cardElement.className = 'gallery-item';
+                cardElement.innerHTML = `
+                    <img src="${card.imageUrl}" alt="${card.title}">
+                    <div class="gallery-item-content">
+                        <h3>${card.title}</h3>
+                        <p><strong>Материалы:</strong> ${formatMaterialsList(card.materials)}</p>
+                        <p><strong>Стоимость:</strong> ${card.cost}</p>
+                        <div class="gallery-item-actions">
+                            <button class="edit-btn" onclick="openEditModal(${card.id})">Редактировать</button>
+                            <button class="delete-btn" onclick="deleteCard(${card.id})">Удалить</button>
+                        </div>
+                    </div>
+                `;
+                gallery.appendChild(cardElement);
+            });
+            
+            saveCards(cards);
+        }
+
+   
+        function formatMaterialsList(materials) {
+            if (Array.isArray(materials)) {
+                return materials.map(m => `${m.name} (${m.quantity} шт.)`).join(', ');
+            }
+            return materials;
+        }
+
+    
+        async function addNewCard() {
+            const title = document.getElementById('card-title').value;
+            const materials = getSelectedMaterials();
+            const totalCost = calculateTotalCost();
+            
+            if (!title) {
+                showNotification('Пожалуйста, введите название проекта', 'error');
+                return;
+            }
+            
+            if (materials.length === 0) {
+                showNotification('Пожалуйста, выберите хотя бы один материал', 'error');
+                return;
+            }
+            
+            let imageUrl = '';
+            if (currentImageFile) {
+                try {
+                    imageUrl = await fileToBase64(currentImageFile);
+                } catch (error) {
+                    showNotification('Ошибка при загрузке изображения', 'error');
+                    return;
+                }
+            }
+            
+            const newCard = {
+                id: Date.now(),
+                imageUrl: imageUrl,
+                title,
+                materials: materials,
+                cost: `${totalCost.toLocaleString('ru-RU')} руб.`,
+                totalCost: totalCost
+            };
+            
+            cards.push(newCard);
+            renderCards();
+            
+   
+            document.getElementById('add-card-form').reset();
+            document.getElementById('image-preview').innerHTML = '';
+            document.getElementById('material-selection').innerHTML = `
+                <div class="material-item" data-index="0">
+                    <select class="material-select" onchange="updateMaterialPrice(this)">
+                        <option value="">Выберите материал</option>
+                    </select>
+                    <input type="number" class="material-quantity" min="1" value="1" placeholder="Кол-во" onchange="calculateTotalCost()">
+                    <span class="material-price">0 руб.</span>
+                    <button type="button" class="remove-material-btn" onclick="removeMaterial(this)" style="display: none;">×</button>
+                </div>
+            `;
+            document.getElementById('total-cost').textContent = '0 руб.';
+            currentImageFile = null;
+            
+            populateMaterialSelects();
+            showNotification('Карточка успешно добавлена!', 'success');
+        }
+
+    
+        function openEditModal(cardId) {
+            const card = cards.find(c => c.id === cardId);
+            if (!card) return;
+            
+            document.getElementById('edit-card-id').value = card.id;
+            document.getElementById('edit-card-title').value = card.title;
+            
+
+            const materialContainer = document.getElementById('edit-material-selection');
+            materialContainer.innerHTML = '';
+            
+            if (Array.isArray(card.materials)) {
+                card.materials.forEach((material, index) => {
+                    const materialItem = document.createElement('div');
+                    materialItem.className = 'material-item';
+                    materialItem.setAttribute('data-index', index);
+                    materialItem.innerHTML = `
+                        <select class="material-select" onchange="updateEditMaterialPrice(this)">
+                            <option value="">Выберите материал</option>
+                        </select>
+                        <input type="number" class="material-quantity" min="1" value="${material.quantity}" placeholder="Кол-во" onchange="calculateEditTotalCost()">
+                        <span class="material-price">0 руб.</span>
+                        <button type="button" class="remove-material-btn" onclick="removeEditMaterial(this)">×</button>
+                    `;
+                    materialContainer.appendChild(materialItem);
+                });
+            }
+            
+     
+            const editPreview = document.getElementById('edit-image-preview');
+            editPreview.innerHTML = `<img src="${card.imageUrl}" alt="Current image">`;
+            
+      
+            currentEditImageFile = null;
+            document.getElementById('edit-image-file').value = '';
+            
+         
+            setTimeout(() => {
+                populateMaterialSelects();
+                if (Array.isArray(card.materials)) {
+                    const selects = materialContainer.querySelectorAll('.material-select');
+                    card.materials.forEach((material, index) => {
+                        if (selects[index]) {
+                            selects[index].value = material.name;
+                            updateEditMaterialPrice(selects[index]);
+                        }
+                    });
+                }
+                calculateEditTotalCost();
+            }, 100);
+            
+            document.getElementById('edit-modal').style.display = 'block';
+        }
+
+    
+        function closeEditModal() {
+            document.getElementById('edit-modal').style.display = 'none';
+        }
+
+ 
+        async function saveCardChanges() {
+            const cardId = parseInt(document.getElementById('edit-card-id').value);
+            const title = document.getElementById('edit-card-title').value;
+            const materials = getEditSelectedMaterials();
+            const totalCost = calculateEditTotalCost();
+            
+            const cardIndex = cards.findIndex(c => c.id === cardId);
+            if (cardIndex !== -1) {
+                let imageUrl = cards[cardIndex].imageUrl;
+                
+                if (currentEditImageFile) {
+                    try {
+                        imageUrl = await fileToBase64(currentEditImageFile);
+                    } catch (error) {
+                        showNotification('Ошибка при загрузке изображения', 'error');
+                        return;
+                    }
+                }
+                
+                cards[cardIndex] = {
+                    id: cardId,
+                    imageUrl,
+                    title,
+                    materials: materials,
+                    cost: `${totalCost.toLocaleString('ru-RU')} руб.`,
+                    totalCost: totalCost
+                };
+                
+                renderCards();
+                closeEditModal();
+                showNotification('Карточка успешно обновлена!', 'success');
+            }
+        }
+
+
+        function deleteCard(cardId) {
+            if (confirm('Вы уверены, что хотите удалить эту карточку?')) {
+                cards = cards.filter(c => c.id !== cardId);
+                renderCards();
+                showNotification('Карточка успешно удалена!', 'success');
+            }
+        }
+
+  
+        function showNotification(message, type) {
+            const notification = document.getElementById('notification');
+            notification.textContent = message;
+            notification.className = `notification ${type}`;
+            notification.style.opacity = '1';
+            
+            setTimeout(() => {
+                notification.style.opacity = '0';
+            }, 3000);
+        }
+
+        window.onclick = function(event) {
+            const modal = document.getElementById('edit-modal');
+            if (event.target === modal) {
+                closeEditModal();
+            }
+        }
+    </script>
+</body>
+</html>

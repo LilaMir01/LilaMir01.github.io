@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Регистрация</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+            background-color: #f5f5f5;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .header {
+            background-color: #ffb299;
+            padding: 20px 0;
+            text-align: center;
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index: 100;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .header h1 {
+            color: white;
+            font-size: 36px;
+            font-weight: bold;
+        }
+
+        .auth-container {
+            background-color: white;
+            border-radius: 12px;
+            box-shadow: 0 3px 15px rgba(0,0,0,0.1);
+            padding: 40px;
+            width: 100%;
+            max-width: 450px;
+            margin-top: 80px;
+        }
+
+        .auth-title {
+            font-size: 28px;
+            margin-bottom: 30px;
+            color: #333;
+            text-align: center;
+        }
+
+        .auth-form {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+            position: relative;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            color: #555;
+            font-weight: bold;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 12px 45px 12px 15px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: #ff8c6d;
+        }
+
+        .form-input.error {
+            border-color: #ff4d4d;
+        }
+
+        .password-toggle {
+            position: absolute;
+            right: 15px;
+            top: 38px;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: #777;
+            font-size: 18px;
+        }
+
+        .password-toggle:hover {
+            color: #ff8c6d;
+        }
+
+        .error-message {
+            color: #ff4d4d;
+            font-size: 14px;
+            margin-top: 5px;
+            display: none;
+        }
+
+        .success-message {
+            color: #4CAF50;
+            font-size: 14px;
+            margin-top: 5px;
+            display: none;
+        }
+
+        .auth-button {
+            background-color: #ff8c6d;
+            color: white;
+            border: none;
+            padding: 14px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 18px;
+            font-weight: bold;
+            transition: background-color 0.3s;
+            margin-top: 10px;
+        }
+
+        .auth-button:hover {
+            background-color: #ff7a55;
+        }
+
+        .auth-links {
+            text-align: center;
+            margin-top: 25px;
+            color: #666;
+        }
+
+        .auth-link {
+            color: #ff8c6d;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        .auth-link:hover {
+            text-decoration: underline;
+        }
+
+        .divider {
+            height: 1px;
+            background-color: #eee;
+            margin: 25px 0;
+        }
+
+        .auth-footer {
+            font-size: 14px;
+            color: #888;
+            text-align: center;
+            margin-top: 20px;
+            line-height: 1.5;
+        }
+
+        @media (max-width: 768px) {
+            .auth-container {
+                padding: 25px;
+                margin: 100px 15px 20px;
+            }
+            
+            .header h1 {
+                font-size: 28px;
+            }
+            
+            .auth-title {
+                font-size: 24px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="auth-container">
+        <h2 class="auth-title">Регистрация</h2>
+        
+        <div class="auth-links">
+            <p>Есть аккаунт? <a href="authorization.html" class="auth-link">Войти</a></p>
+        </div>
+        
+        <form class="auth-form" id="regForm">
+            <div class="form-group">
+                <label class="form-label">Email</label>
+                <input type="email" class="form-input" id="regEmail" placeholder="Введите ваш email" required>
+                <div class="error-message" id="regEmailError">Пожалуйста, введите корректный email</div>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">Пароль</label>
+                <input type="password" class="form-input" id="regPassword" placeholder="Введите пароль" required>
+                <button type="button" class="password-toggle" id="regPasswordToggle">
+                    <span id="regPasswordToggleIcon">👁️</span>
+                </button>
+                <div class="error-message" id="regPasswordError"></div>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">Повторите пароль</label>
+                <input type="password" class="form-input" id="regPasswordConfirm" placeholder="Повторите пароль" required>
+                <button type="button" class="password-toggle" id="regPasswordConfirmToggle">
+                    <span id="regPasswordConfirmToggleIcon">👁️</span>
+                </button>
+                <div class="error-message" id="regPasswordConfirmError">Пароли не совпадают</div>
+            </div>
+            
+            <div class="success-message" id="regSuccessMessage">Вы успешно зарегистрировались</div>
+            
+            <button type="submit" class="auth-button">Зарегистрироваться</button>
+        </form>
+        
+        <div class="divider"></div>
+        
+        <div class="auth-footer">
+            <p>Войдя в систему, вы соглашаетесь с "Условиями использования" и "Политикой конфиденциальности"</p>
+        </div>
+    </div>
+
+    <script>
+        
+        function getUsers() {
+            const usersJSON = localStorage.getItem('users');
+            return usersJSON ? JSON.parse(usersJSON) : [];
+        }
+
+     
+        function saveUsers(users) {
+            localStorage.setItem('users', JSON.stringify(users));
+        }
+
+   
+        function validateEmail(email) {
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            return emailRegex.test(email);
+        }
+
+      
+        function validatePassword(password) {
+            if (password.length < 5) {
+                return { isValid: false, message: "Пароль должен содержать не менее 5 символов" };
+            }
+            if (password.length > 15) {
+                return { isValid: false, message: "Пароль должен содержать не более 15 символов" };
+            }
+            if (/\s/.test(password)) {
+                return { isValid: false, message: "Пароль не должен содержать пробелы" };
+            }
+            if (!/\d/.test(password)) {
+                return { isValid: false, message: "Пароль должен содержать хотя бы одну цифру" };
+            }
+       
+            if (!/^[A-Za-z0-9!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]*$/.test(password)) {
+                return { isValid: false, message: "Пароль должен содержать только латинские символы" };
+            }
+            return { isValid: true, message: "" };
+        }
+
+   
+        function togglePasswordVisibility(passwordInputId, toggleIconId) {
+            const passwordInput = document.getElementById(passwordInputId);
+            const toggleIcon = document.getElementById(toggleIconId);
+            
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                toggleIcon.textContent = '🙈';
+            } else {
+                passwordInput.type = 'password';
+                toggleIcon.textContent = '👁️';
+            }
+        }
+
+     
+        document.getElementById('regPasswordToggle').addEventListener('click', function() {
+            togglePasswordVisibility('regPassword', 'regPasswordToggleIcon');
+        });
+
+        document.getElementById('regPasswordConfirmToggle').addEventListener('click', function() {
+            togglePasswordVisibility('regPasswordConfirm', 'regPasswordConfirmToggleIcon');
+        });
+
+     
+        document.getElementById('regForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+         
+            document.querySelectorAll('.error-message').forEach(el => {
+                el.style.display = 'none';
+            });
+            document.getElementById('regSuccessMessage').style.display = 'none';
+            
+       
+            const email = document.getElementById('regEmail').value.trim();
+            const password = document.getElementById('regPassword').value;
+            const passwordConfirm = document.getElementById('regPasswordConfirm').value;
+            
+            let isValid = true;
+            
+      
+            if (!validateEmail(email)) {
+                document.getElementById('regEmailError').style.display = 'block';
+                document.getElementById('regEmail').classList.add('error');
+                isValid = false;
+            } else {
+                document.getElementById('regEmail').classList.remove('error');
+            }
+            
+       
+            const passwordValidation = validatePassword(password);
+            if (!passwordValidation.isValid) {
+                document.getElementById('regPasswordError').textContent = passwordValidation.message;
+                document.getElementById('regPasswordError').style.display = 'block';
+                document.getElementById('regPassword').classList.add('error');
+                isValid = false;
+            } else {
+                document.getElementById('regPassword').classList.remove('error');
+            }
+            
+        
+            if (password !== passwordConfirm) {
+                document.getElementById('regPasswordConfirmError').style.display = 'block';
+                document.getElementById('regPasswordConfirm').classList.add('error');
+                isValid = false;
+            } else {
+                document.getElementById('regPasswordConfirm').classList.remove('error');
+            }
+            
+            if (!isValid) return;
+            
+         
+            const users = getUsers();
+            const existingUser = users.find(u => u.email === email);
+            
+            if (existingUser) {
+                document.getElementById('regEmailError').textContent = "Пользователь с таким email уже существует";
+                document.getElementById('regEmailError').style.display = 'block';
+                document.getElementById('regEmail').classList.add('error');
+                return;
+            }
+            
+       
+            const newUser = {
+                email: email,
+                password: password,
+                registrationDate: new Date().toISOString()
+            };
+            
+            users.push(newUser);
+            saveUsers(users);
+            
+        
+            document.getElementById('regSuccessMessage').style.display = 'block';
+            
+          
+            setTimeout(() => {
+                window.location.href = 'authorization.html';
+            }, 2000);
+        });
+    </script>
+</body>
+</html>
