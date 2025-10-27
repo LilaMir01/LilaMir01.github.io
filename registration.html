@@ -201,7 +201,7 @@
                 <label class="form-label">Пароль</label>
                 <input type="password" class="form-input" id="regPassword" placeholder="Введите пароль" required>
                 <button type="button" class="password-toggle" id="regPasswordToggle">
-                    <span id="regPasswordToggleIcon">👁️</span>
+                    <span id="regPasswordToggleIcon">⭕</span>
                 </button>
                 <div class="error-message" id="regPasswordError"></div>
             </div>
@@ -210,7 +210,7 @@
                 <label class="form-label">Повторите пароль</label>
                 <input type="password" class="form-input" id="regPasswordConfirm" placeholder="Повторите пароль" required>
                 <button type="button" class="password-toggle" id="regPasswordConfirmToggle">
-                    <span id="regPasswordConfirmToggleIcon">👁️</span>
+                    <span id="regPasswordConfirmToggleIcon">⭕</span>
                 </button>
                 <div class="error-message" id="regPasswordConfirmError">Пароли не совпадают</div>
             </div>
@@ -228,59 +228,63 @@
     </div>
 
     <script>
-        
         function getUsers() {
             const usersJSON = localStorage.getItem('users');
             return usersJSON ? JSON.parse(usersJSON) : [];
         }
 
-     
         function saveUsers(users) {
             localStorage.setItem('users', JSON.stringify(users));
         }
 
-   
         function validateEmail(email) {
             const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
             return emailRegex.test(email);
         }
 
-      
         function validatePassword(password) {
-            if (password.length < 5) {
-                return { isValid: false, message: "Пароль должен содержать не менее 5 символов" };
+            if (!password) {
+                return { isValid: false, message: "Пожалуйста, введите пароль" };
             }
-            if (password.length > 15) {
-                return { isValid: false, message: "Пароль должен содержать не более 15 символов" };
+            if (password.length < 3) {
+                return { isValid: false, message: "Пароль должен содержать не менее 3 символов" };
             }
-            if (/\s/.test(password)) {
-                return { isValid: false, message: "Пароль не должен содержать пробелы" };
+            if (password.length > 25) {
+                return { isValid: false, message: "Пароль должен содержать не более 25 символов" };
+            }
+            if (!/^[A-Za-z0-9]+$/.test(password)) {
+                return { isValid: false, message: "Пароль должен содержать только латинские символы и цифры" };
             }
             if (!/\d/.test(password)) {
                 return { isValid: false, message: "Пароль должен содержать хотя бы одну цифру" };
             }
-       
-            if (!/^[A-Za-z0-9!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]*$/.test(password)) {
-                return { isValid: false, message: "Пароль должен содержать только латинские символы" };
+            return { isValid: true, message: "" };
+        }
+
+        function validateEmailLength(email) {
+            const emailWithoutDomain = email.split('@')[0];
+            if (emailWithoutDomain.length < 3) {
+                return { isValid: false, message: "Логин должен содержать не менее 3 символов" };
+            }
+            if (emailWithoutDomain.length > 25) {
+                return { isValid: false, message: "Логин должен содержать не более 25 символов" };
             }
             return { isValid: true, message: "" };
         }
 
-   
         function togglePasswordVisibility(passwordInputId, toggleIconId) {
             const passwordInput = document.getElementById(passwordInputId);
             const toggleIcon = document.getElementById(toggleIconId);
             
             if (passwordInput.type === 'password') {
                 passwordInput.type = 'text';
-                toggleIcon.textContent = '🙈';
+                toggleIcon.textContent = '❌';
             } else {
                 passwordInput.type = 'password';
-                toggleIcon.textContent = '👁️';
+                toggleIcon.textContent = '⭕';
             }
         }
 
-     
         document.getElementById('regPasswordToggle').addEventListener('click', function() {
             togglePasswordVisibility('regPassword', 'regPasswordToggleIcon');
         });
@@ -289,33 +293,35 @@
             togglePasswordVisibility('regPasswordConfirm', 'regPasswordConfirmToggleIcon');
         });
 
-     
         document.getElementById('regForm').addEventListener('submit', function(e) {
             e.preventDefault();
             
-         
             document.querySelectorAll('.error-message').forEach(el => {
                 el.style.display = 'none';
             });
             document.getElementById('regSuccessMessage').style.display = 'none';
             
-       
             const email = document.getElementById('regEmail').value.trim();
             const password = document.getElementById('regPassword').value;
             const passwordConfirm = document.getElementById('regPasswordConfirm').value;
             
             let isValid = true;
-            
-      
             if (!validateEmail(email)) {
+                document.getElementById('regEmailError').textContent = "Пожалуйста, введите корректный email";
                 document.getElementById('regEmailError').style.display = 'block';
                 document.getElementById('regEmail').classList.add('error');
                 isValid = false;
             } else {
-                document.getElementById('regEmail').classList.remove('error');
+                const emailLengthValidation = validateEmailLength(email);
+                if (!emailLengthValidation.isValid) {
+                    document.getElementById('regEmailError').textContent = emailLengthValidation.message;
+                    document.getElementById('regEmailError').style.display = 'block';
+                    document.getElementById('regEmail').classList.add('error');
+                    isValid = false;
+                } else {
+                    document.getElementById('regEmail').classList.remove('error');
+                }
             }
-            
-       
             const passwordValidation = validatePassword(password);
             if (!passwordValidation.isValid) {
                 document.getElementById('regPasswordError').textContent = passwordValidation.message;
@@ -325,8 +331,7 @@
             } else {
                 document.getElementById('regPassword').classList.remove('error');
             }
-            
-        
+
             if (password !== passwordConfirm) {
                 document.getElementById('regPasswordConfirmError').style.display = 'block';
                 document.getElementById('regPasswordConfirm').classList.add('error');
@@ -337,7 +342,6 @@
             
             if (!isValid) return;
             
-         
             const users = getUsers();
             const existingUser = users.find(u => u.email === email);
             
@@ -348,7 +352,6 @@
                 return;
             }
             
-       
             const newUser = {
                 email: email,
                 password: password,
@@ -358,10 +361,8 @@
             users.push(newUser);
             saveUsers(users);
             
-        
             document.getElementById('regSuccessMessage').style.display = 'block';
             
-          
             setTimeout(() => {
                 window.location.href = 'authorization.html';
             }, 2000);
