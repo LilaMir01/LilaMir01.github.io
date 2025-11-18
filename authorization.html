@@ -224,50 +224,32 @@
     </div>
 
     <script>
+      
         function getUsers() {
             const usersJSON = localStorage.getItem('users');
             return usersJSON ? JSON.parse(usersJSON) : [];
         }
 
+   
         function saveUsers(users) {
             localStorage.setItem('users', JSON.stringify(users));
         }
 
+   
         function validateEmail(email) {
             const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
             return emailRegex.test(email);
         }
 
+     
         function validatePassword(password) {
             if (!password) {
                 return { isValid: false, message: "Пожалуйста, введите пароль" };
             }
-            if (password.length < 3) {
-                return { isValid: false, message: "Пароль должен содержать не менее 3 символов" };
-            }
-            if (password.length > 25) {
-                return { isValid: false, message: "Пароль должен содержать не более 25 символов" };
-            }
-            if (!/^[A-Za-z0-9]+$/.test(password)) {
-                return { isValid: false, message: "Пароль должен содержать только латинские символы и цифры" };
-            }
-            if (!/\d/.test(password)) {
-                return { isValid: false, message: "Пароль должен содержать хотя бы одну цифру" };
-            }
             return { isValid: true, message: "" };
         }
 
-        function validateEmailLength(email) {
-            const emailWithoutDomain = email.split('@')[0];
-            if (emailWithoutDomain.length < 3) {
-                return { isValid: false, message: "Логин должен содержать не менее 3 символов" };
-            }
-            if (emailWithoutDomain.length > 25) {
-                return { isValid: false, message: "Логин должен содержать не более 25 символов" };
-            }
-            return { isValid: true, message: "" };
-        }
-
+   
         function togglePasswordVisibility(passwordInputId, toggleIconId) {
             const passwordInput = document.getElementById(passwordInputId);
             const toggleIcon = document.getElementById(toggleIconId);
@@ -281,45 +263,38 @@
             }
         }
 
+     
         document.getElementById('authPasswordToggle').addEventListener('click', function() {
             togglePasswordVisibility('authPassword', 'authPasswordToggleIcon');
         });
 
+     
         document.getElementById('authForm').addEventListener('submit', function(e) {
             e.preventDefault();
             
+       
             document.querySelectorAll('.error-message').forEach(el => {
                 el.style.display = 'none';
             });
             
+     
             const email = document.getElementById('authEmail').value.trim();
             const password = document.getElementById('authPassword').value;
             
             let isValid = true;
             
-            // Валидация email
+        
             if (!validateEmail(email)) {
-                document.getElementById('authEmailError').textContent = "Пожалуйста, введите корректный email";
                 document.getElementById('authEmailError').style.display = 'block';
                 document.getElementById('authEmail').classList.add('error');
                 isValid = false;
             } else {
-                // Валидация длины логина
-                const emailLengthValidation = validateEmailLength(email);
-                if (!emailLengthValidation.isValid) {
-                    document.getElementById('authEmailError').textContent = emailLengthValidation.message;
-                    document.getElementById('authEmailError').style.display = 'block';
-                    document.getElementById('authEmail').classList.add('error');
-                    isValid = false;
-                } else {
-                    document.getElementById('authEmail').classList.remove('error');
-                }
+                document.getElementById('authEmail').classList.remove('error');
             }
             
-            // Валидация пароля
-            const passwordValidation = validatePassword(password);
-            if (!passwordValidation.isValid) {
-                document.getElementById('authPasswordError').textContent = passwordValidation.message;
+      
+            if (!password) {
+                document.getElementById('authPasswordError').textContent = "Пожалуйста, введите пароль";
                 document.getElementById('authPasswordError').style.display = 'block';
                 document.getElementById('authPassword').classList.add('error');
                 isValid = false;
@@ -329,33 +304,38 @@
             
             if (!isValid) return;
             
+         
             const users = getUsers();
             const user = users.find(u => u.email === email && u.password === password);
             
+       
             const adminEmail = 'adminMain176845@mail.ru';
             const adminPassword = 'admin768371main1';
             
             if (email === adminEmail && password === adminPassword) {
+            
                 const adminUser = {
                     email: adminEmail,
                     password: adminPassword,
                     isAdmin: true
                 };
                 localStorage.setItem('currentUser', JSON.stringify(adminUser));
-                alert('Вы успешно авторизовались как администратор!');
                 window.location.href = 'admin.html';
             } else if (user) {
+              
                 localStorage.setItem('currentUser', JSON.stringify(user));
-                alert('Вы успешно авторизовались!');
                 window.location.href = 'index.html';
             } else {
+             
                 document.getElementById('authGeneralError').style.display = 'block';
             }
         });
 
+       
         document.addEventListener('DOMContentLoaded', function() {
-            document.getElementById('authEmail').value = '';
-            document.getElementById('authPassword').value = '';
+          
+            document.getElementById('authEmail').value = 'adminMain176845@mail.ru';
+            document.getElementById('authPassword').value = 'admin768371main1';
         });
     </script>
 </body>
