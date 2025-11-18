@@ -26,6 +26,26 @@
             z-index: 100;
             box-shadow: 0 2px 5px rgba(0,0,0,0.1);
         }
+        .back-btn {
+        position: absolute;
+        left: 20px;
+        top: 50%;
+        transform: translateY(-50%);
+        background-color: rgba(255, 255, 255, 0.2);
+        color: white;
+        text-decoration: none;
+        padding: 10px 20px;
+        border-radius: 20px;
+        font-size: 16px;
+        font-weight: bold;
+        transition: all 0.3s ease;
+        border: 2px solid rgba(255, 255, 255, 0.3);
+    }
+
+    .back-btn:hover {
+        background-color: rgba(255, 255, 255, 0.3);
+        transform: translateY(-50%) scale(1.05);
+    }
 
         .header h1 {
             color: white;
@@ -382,6 +402,7 @@
 
     <div class="header">
         <h1>Расчет стоимости проекта</h1>
+        <a href="index.html" class="back-btn">← Вернуться в галерею</a>
     </div>
 
     <div class="container">
