@@ -17,6 +17,14 @@
             background-color: #f5f5f5;
         }
 
+        .material-list h3 {
+    color: #333;
+    font-size: 18px;
+    border-bottom: 2px solid #ff8c6d;
+    padding-bottom: 5px;
+    margin-bottom: 15px;
+}
+
         .header {
             background-color: #ffb299;
             padding: 30px 0;
@@ -31,6 +39,21 @@
             color: white;
             font-size: 36px;
             font-weight: bold;
+        }
+        .back-to-gallery-btn {
+            background-color: white;
+            color: #ff8c6d;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 16px;
+            transition: background-color 0.3s;
+            position: absolute;
+            left: 20px;
+            top: 50%;
+            transform: translateY(-50%);
         }
 
         .container {
@@ -424,6 +447,7 @@
             .header h1 {
                 font-size: 28px;
             }
+            
         }
     </style>
 </head>
@@ -431,6 +455,7 @@
 
     <div class="header">
         <h1>Административная панель</h1>
+        <button class="back-to-gallery-btn" onclick="goToGallery()">← Вернуться в галерею</button>
     </div>
 
 
@@ -477,6 +502,26 @@
                 
                 <button type="submit" class="btn" id="submit-btn">Добавить карточку</button>
             </form>
+            
+        <div class="admin-panel" style="margin-top: 30px;">
+    <h2>Управление материалами</h2>
+    <div class="form-group">
+        <label>Добавить новый материал</label>
+        <input type="text" id="new-material-name" placeholder="Название материала" style="margin-bottom: 10px;">
+        <input type="number" id="new-material-price" placeholder="Цена за единицу" min="0" step="1">
+        <button type="button" class="btn" onclick="addNewMaterial()" style="margin-top: 15px; background-color: #FF8C6D;">
+            Добавить материал
+        </button>
+    </div>
+    
+    <div class="material-list">
+        <h3 style="margin: 20px 0 10px 0;">Существующие материалы</h3>
+        <div id="materials-list" style="max-height: 300px; overflow-y: auto; border: 1px solid #ddd; border-radius: 8px; padding: 10px;">
+     
+        </div>
+    </div>
+</div>
+            
         </div>
 
 
@@ -534,9 +579,126 @@
     <div id="notification" class="notification"></div>
 
     <script>
+
+        function renderMaterialsList() {
+    const materialsList = document.getElementById('materials-list');
+    materialsList.innerHTML = '';
+    
+    Object.keys(materialPrices).forEach(material => {
+        const materialItem = document.createElement('div');
+        materialItem.className = 'material-item';
+        materialItem.style.cssText = 'display: flex; justify-content: space-between; align-items: center; padding: 10px; margin-bottom: 5px; background: #f9f9f9; border-radius: 6px;';
+        materialItem.innerHTML = `
+            <span style="flex: 1;"><strong>${material}</strong></span>
+            <span style="margin: 0 15px; color: #28a745; font-weight: bold;">${materialPrices[material]} руб.</span>
+            <button type="button" class="remove-material-btn" onclick="removeMaterialFromList('${material}')" style="background-color: #dc3545;">×</button>
+        `;
+        materialsList.appendChild(materialItem);
+    });
+}
+
+// Функция для добавления нового материала
+async function addNewMaterial() {
+    const nameInput = document.getElementById('new-material-name');
+    const priceInput = document.getElementById('new-material-price');
+    
+    const name = nameInput.value.trim();
+    const price = parseInt(priceInput.value);
+    
+    if (!name) {
+        return;
+    }
+    
+    if (isNaN(price) || price <= 0) {
+        return;
+    }
+    
+    if (materialPrices[name]) {
+        return;
+    }
+    
+    try {
+        // Добавляем материал в локальный объект
+        materialPrices[name] = price;
+        
+        // Обновляем интерфейс
+        populateMaterialSelects();
+        renderMaterialsList();
+        
+        // Очищаем поля ввода
+        nameInput.value = '';
+        priceInput.value = '';
+        
+        showNotification('Материал успешно добавлен!', 'success');
+        
+    } catch (error) {
+        console.error('Ошибка при добавлении материала:', error);
+        showNotification('Ошибка при добавлении материала', 'error');
+    }
+}
+
+// Функция для удаления материала
+async function removeMaterialFromList(materialName) {    
+    try {
+        // Удаляем материал из локального объекта
+        delete materialPrices[materialName];
+        
+        // Обновляем интерфейс
+        populateMaterialSelects();
+        renderMaterialsList();
+        
+        showNotification('Материал успешно удален!', 'success');
+        
+    } catch (error) {
+        console.error('Ошибка при удалении материала:', error);
+        showNotification('Ошибка при удалении материала', 'error');
+    }
+}
+
+// Обновите функцию loadMaterialPrices для отображения списка материалов
+async function loadMaterialPrices() {
+    try {
+        const response = await fetch('price.json');
+        materialPrices = await response.json();
+        populateMaterialSelects();
+        renderMaterialsList(); // Добавьте эту строку
+    } catch (error) {
+        console.error('Ошибка загрузки price.json:', error);
+        materialPrices = {
+            "АльтаПрофиль Панели Туф ЭКО": 568,
+            "Альта Профиль Панели Фагот ЭКО": 596,
+            "АльтаПрофиль сайдинг Классика Серый": 340,
+            "АльтаПрофиль сайдинг Классика Земляника": 390,
+            "АльтаПрофиль сайдинг Классика Белый": 320,
+            "АльтаПрофиль сайдинг Классика Кремовый": 330,
+            "Альта профиль Панели камень Скалистый": 600,
+            "АльтаПрофиль панели Камень Шотландский": 685,
+            "Альта Профиль панели Камень Клинкерный": 632,
+            "Альта Профиль панели Камень Скалистый ЭКО": 595
+        };
+        populateMaterialSelects();
+        renderMaterialsList(); // Добавьте эту строку
+    }
+}
+
+        function goToGallery() {
+    window.location.href = 'index.html';
+}
  
         const STORAGE_KEY = 'galleryCards';
         
+
+        const DEMO_IMAGES = [
+            'img/1.png',
+            'img/2.png',
+            'img/3.png',
+            'img/4.png',
+            'img/5.png',
+            'img/6.png',
+            'img/7.png',
+            'img/8.png',
+            'img/9.png'
+        ];
  
         let materialPrices = {};
         
@@ -552,11 +714,21 @@
                 populateMaterialSelects();
             } catch (error) {
                 console.error('Ошибка загрузки price.json:', error);
-
+                materialPrices = {
+                    "АльтаПрофиль Панели Туф ЭКО": 568,
+                    "Альта Профиль Панели Фагот ЭКО": 596,
+                    "АльтаПрофиль сайдинг Классика Серый": 340,
+                    "АльтаПрофиль сайдинг Классика Земляника": 390,
+                    "АльтаПрофиль сайдинг Классика Белый": 320,
+                    "АльтаПрофиль сайдинг Классика Кремовый": 330,
+                    "Альта профиль Панели камень Скалистый": 600,
+                    "АльтаПрофиль панели Камень Шотландский": 685,
+                    "Альта Профиль панели Камень Клинкерный": 632,
+                    "Альта Профиль панели Камень Скалистый ЭКО": 595
                 };
                 populateMaterialSelects();
             }
-        
+        }
 
 
         function populateMaterialSelects() {
@@ -614,6 +786,57 @@
             });
         });
 
+        // Функция для создания демо-карточек из price.json
+        async function createDemoCards() {
+            try {
+                const materialNames = Object.keys(materialPrices);
+                
+                // Создаем 9 демо-карточек
+                const demoCards = [];
+                for (let i = 0; i < 9 && i < materialNames.length; i++) {
+                    const materialName = materialNames[i];
+                    const price = materialPrices[materialName];
+                    
+                    // Создаем случайное количество материалов (1-3 разных материала)
+                    const materialCount = Math.floor(Math.random() * 3) + 1;
+                    const materials = [];
+                    let totalCost = 0;
+                    
+                    for (let j = 0; j < materialCount; j++) {
+                        const materialIndex = (i + j) % materialNames.length;
+                        const matName = materialNames[materialIndex];
+                        const matPrice = materialPrices[matName];
+                        const quantity = Math.floor(Math.random() * 5) + 1;
+                        
+                        materials.push({
+                            name: matName,
+                            quantity: quantity,
+                            price: matPrice
+                        });
+                        
+                        totalCost += matPrice * quantity;
+                    }
+                    
+                    demoCards.push({
+                        id: Date.now() + i,
+                        imageUrl: DEMO_IMAGES[i] || 'img/demo1.jpg',
+                        title: `Проект ${i + 1}`,
+                        materials: materials,
+                        cost: `${totalCost.toLocaleString('ru-RU')} руб.`,
+                        totalCost: totalCost
+                    });
+                }
+                
+                cards = demoCards;
+                saveCards(cards);
+                renderCards();
+                showNotification('9 демо-карточек успешно созданы!', 'success');
+                
+            } catch (error) {
+                console.error('Ошибка создания демо-карточек:', error);
+                showNotification('Ошибка при создании демо-карточек', 'error');
+            }
+        }
   
         function addMaterial() {
             const container = document.getElementById('material-selection');
@@ -910,7 +1133,7 @@
             gallery.innerHTML = '';
             
             if (cards.length === 0) {
-                gallery.innerHTML = '<p>Карточек пока нет. Добавьте первую карточку!</p>';
+                gallery.innerHTML = '<p>Карточек пока нет. Добавьте первую карточку или создайте демо-карточки!</p>';
                 return;
             }
             
@@ -918,7 +1141,7 @@
                 const cardElement = document.createElement('div');
                 cardElement.className = 'gallery-item';
                 cardElement.innerHTML = `
-                    <img src="${card.imageUrl}" alt="${card.title}">
+                    <img src="${card.imageUrl}" alt="${card.title}" onerror="this.src='img/demo1.jpg'">
                     <div class="gallery-item-content">
                         <h3>${card.title}</h3>
                         <p><strong>Материалы:</strong> ${formatMaterialsList(card.materials)}</p>
@@ -1032,7 +1255,7 @@
             
      
             const editPreview = document.getElementById('edit-image-preview');
-            editPreview.innerHTML = `<img src="${card.imageUrl}" alt="Current image">`;
+            editPreview.innerHTML = `<img src="${card.imageUrl}" alt="Current image" onerror="this.src='img/demo1.jpg'">`;
             
       
             currentEditImageFile = null;
@@ -1098,11 +1321,9 @@
 
 
         function deleteCard(cardId) {
-            if (confirm('Вы уверены, что хотите удалить эту карточку?')) {
                 cards = cards.filter(c => c.id !== cardId);
                 renderCards();
                 showNotification('Карточка успешно удалена!', 'success');
-            }
         }
 
   
